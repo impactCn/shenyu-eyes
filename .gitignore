@@ -3,5 +3,6 @@
 *.iml
 out
 gen
-/target/
-/.idea/
+target
+
+.idea
