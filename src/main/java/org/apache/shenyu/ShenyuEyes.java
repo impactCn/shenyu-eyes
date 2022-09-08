@@ -2,6 +2,7 @@ package org.apache.shenyu;
 
 
 import org.apache.shenyu.entity.JarDO;
+import org.apache.shenyu.env.CheckEnv;
 import org.apache.shenyu.util.FileUtil;
 import org.apache.shenyu.util.StringUtil;
 
@@ -11,33 +12,56 @@ import java.util.List;
 public class ShenyuEyes {
 
     public static void main(String[] args) {
-//        String filePath = "C:\\Users\\User\\Desktop\\新建文件夹 (2)\\apache-shenyu-2.5.0-bootstrap-bin.tar.gz";
 
-        String filePath = args[0];
+        // check py version
+        System.out.println("Start to check python version...");
+        if (CheckEnv.PYTHON_CHECK) {
+            System.out.println("The python version check passed.");
 
-        String destDir = filePath.substring(0, filePath.lastIndexOf("\\"));
-        String fileDir = filePath.substring(filePath.lastIndexOf("\\") + 1).replace(".tar.gz", "");
+//            String filePath = args[0];
+            String filePath = "C:\\Users\\User\\Desktop\\新建文件夹 (2)\\apache-shenyu-2.5.0-bootstrap-bin.tar.gz";
 
-//
-        FileUtil.unTarGz(filePath, destDir);
-        List<String> fileNames = FileUtil.getFileName(destDir + "\\" + fileDir + "\\lib");
+            String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
 
-        JarDO jarDO = JarDO.build(fileNames);
+            System.out.println("Start to unzip " + fileName + "...");
 
-        String content = FileUtil.read(destDir + "\\" + fileDir + "\\LICENSE");
+            String destDir = filePath.substring(0, filePath.lastIndexOf("\\"));
+            String fileDir = fileName.replace(".tar.gz", "");
 
-        List<String> failureMatchJar = new ArrayList<>();
+            FileUtil.unTarGz(filePath, destDir);
+            System.out.println("Decompression succeeded.");
+            System.out.println("Start to check LICENSE...");
+            List<String> fileNames = FileUtil.getFileName(destDir + "\\" + fileDir + "\\lib");
 
-        for (JarDO.ParseJar parseJar : jarDO.getParseJar()) {
+            JarDO jarDO = JarDO.build(fileNames);
+            String content = FileUtil.read(destDir + "\\" + fileDir + "\\LICENSE");
 
-            if (!StringUtil.match(content, parseJar.getPackageName() + " " + parseJar.getVersion())) {
-                failureMatchJar.add(parseJar.getOriginal());
-                System.err.println(parseJar.getOriginal());
+            List<String> failureMatchJar = new ArrayList<>();
+
+            for (JarDO.ParseJar parseJar : jarDO.getParseJar()) {
+
+                if (parseJar.getOriginal().contains("shenyu")) {
+                    continue;
+                }
+
+                if (!StringUtil.match(content, parseJar.getPackageName() + " " + parseJar.getVersion())) {
+                    failureMatchJar.add(parseJar.getOriginal());
+                }
+
             }
 
+            if (failureMatchJar.size() > 0) {
+                System.err.println("The following jars need to be modified");
+                failureMatchJar.forEach(System.err::println);
+            }
+
+            jarDO.setFailureMatchJar(failureMatchJar);
+
+        } else {
+            System.err.println("The python version not 3.8");
         }
 
-        jarDO.setFailureMatchJar(failureMatchJar);
+
 
     }
 
