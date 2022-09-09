@@ -18,8 +18,7 @@ public class ShenyuEyes {
         if (CheckEnv.PYTHON_CHECK) {
             System.out.println("The python version check passed.");
 
-//            String filePath = args[0];
-            String filePath = "C:\\Users\\User\\Desktop\\新建文件夹 (2)\\apache-shenyu-2.5.0-bootstrap-bin.tar.gz";
+            String filePath = args[0];
 
             String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
 
@@ -51,7 +50,7 @@ public class ShenyuEyes {
             }
 
             if (failureMatchJar.size() > 0) {
-                System.err.println("The following jars need to be modified");
+                System.err.println("The following jars need to be modified: ");
                 failureMatchJar.forEach(System.err::println);
             }
 
@@ -60,8 +59,6 @@ public class ShenyuEyes {
         } else {
             System.err.println("The python version not 3.8");
         }
-
-
 
     }
 

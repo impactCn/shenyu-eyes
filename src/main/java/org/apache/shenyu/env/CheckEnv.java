@@ -5,8 +5,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author sinsy
@@ -37,8 +35,4 @@ public class CheckEnv {
 
     }
 
-    public static void main(String[] args) throws IOException {
-        System.err.println(CheckEnv.PYTHON_CHECK);
-
-    }
 }
